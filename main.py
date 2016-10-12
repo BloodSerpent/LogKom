@@ -123,7 +123,7 @@ class NQueens:
         
     
 if __name__ == '__main__':
-    prob = NQueens(3)
+    prob = NQueens(4)
     prob.row_constraint_init()
     prob.column_constraint_init()
     prob.diagonal_constraint_init()
