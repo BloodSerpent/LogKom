@@ -52,11 +52,44 @@ class NQueens:
     
     
     def diagonal_constraint_init(self):
-        diags = [self.matrix[::-1,:].diagonal(i) for i in range(-self.matrix.shape[0]+1,self.matrix.shape[1])]
-        diags.extend(self.matrix.diagonal(i) for i in range(self.matrix.shape[1]-1,-self.matrix.shape[0],-1))
-        diags = [d for d in [n.tolist() for n in diags] if len(d) > 1]
+        diags = self.extract_diagonal(self.matrix)
         for l in diags:
             self.less_than_equal_one(list(l))
+
+    def extract_diagonal(self, matrix):
+        diags = [matrix[::-1,:].diagonal(i) for i in range(-matrix.shape[0]+1,matrix.shape[1])]
+        diags.extend(matrix.diagonal(i) for i in range(matrix.shape[1]-1,-matrix.shape[0],-1))
+        diags = [d for d in [n.tolist() for n in diags] if len(d) > 1]
+        return diags
+
+    def valid_answer(self, answer):
+        if self.valid_row(answer):
+            if self.valid_column(answer):
+                if self.valid_diags(answer):
+                    return True
+        return False
+
+    def valid_row(self, answer):
+        for l in answer:
+            l = list(l)
+            if sum(l) != 1:
+                return False
+        return True
+
+    def valid_column(self, answer):
+        m = answer.transpose()
+        for l in m:
+            l = list(l)
+            if sum(l) != 1:
+                return False
+        return True
+
+    def valid_diags(self, answer):
+        diags = self.extract_diagonal(answer)
+        for l in diags:
+            if sum(l) > 1:
+                return False
+        return True
         
     '''
         header for minisat:
@@ -73,13 +106,24 @@ class NQueens:
             strs = strs + "\n"
             f.write(strs)
         f.close()
+
+    def get_output(self):
+        f = open("output.out",'r')
+        f.readline()
+        s = f.readline().strip().split()
+        f.close()
+        if len(s) == 0:
+            return []
+        s.pop(self.n*self.n)
+        s = [int(x) for x in s]
+        return s
     
     def run_minisat(self,input_file,outputfile):
         os.system("minisat "+input_file+" "+outputfile)
         
     
 if __name__ == '__main__':
-    prob = NQueens(4)
+    prob = NQueens(3)
     prob.row_constraint_init()
     prob.column_constraint_init()
     prob.diagonal_constraint_init()
